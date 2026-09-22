@@ -21,16 +21,18 @@
   <div id="turnstile-container"></div>
 
   <script>
-    // Sender resultatet tilbage til React Native-appen der har denne side i en WebView.
+    // Sender resultatet tilbage til værten — enten React Native-appen (native,
+    // siden ligger i en WebView) eller web-appen (siden ligger i et <iframe>).
     function postTilApp(payload) {
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+      } else if (window.parent && window.parent !== window) {
+        window.parent.postMessage(payload, '*');
       }
     }
 
     window.onloadTurnstileCallback = function () {
       turnstile.render('#turnstile-container', {
-        // TODO: udskift med din rigtige Cloudflare Turnstile site key (se README.md i denne mappe)
         sitekey: '0x4AAAAAAAEzAP3CqADxtTksu',
         appearance: 'interaction-only', // usynlig for de fleste — vises kun ved mistænkelig trafik
         callback: function (token) {
